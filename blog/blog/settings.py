@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'HOST': 'localhost',
         'PORT': 3306,
-        'USER': 'SkyChanMae',
+        'USER': 'root',
         'PASSWORD': '123456',
         'NAME': 'blog'
     }
@@ -188,3 +188,6 @@ LOGGING = {
         },
     }
 }
+
+
+AUTH_USER_MODEL='users.User'
