@@ -15,6 +15,7 @@ from django.http.response import HttpResponseBadRequest
 from libs.captcha.captcha import captcha
 from django_redis import get_redis_connection
 from django.http import HttpResponse
+import redis
 class ImageCodeView(View):
 
     def get(self,request):
