@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
+from django.urls import reverse
 
 # Create your views here.
 from django.views import View
@@ -15,38 +17,41 @@ class RegisterView(View):
 
         return render(request,'register.html')
 
-#     def post(self,request):
-#
-#         mobile=request.POST.get('mobile')
-#         password=request.POST.get('password')
-#         password2=request.POST.get('password2')
-#         smscode=request.POST.get('sms_code')
-#
-#         if not all([mobile,password,password2,smscode]):
-#             return HttpResponseBadRequest('缺少必要的参数')
-#
-#         if not re.match(r'^1[3-9]\d{9}$',mobile):
-#             return HttpResponseBadRequest('手机号不符合规则')
-#
-#         if not re.match(r'^[0-9A-Za-z]{8,20}$',password):
-#             return HttpResponseBadRequest('请输入正确的8-20位密码，数字和字母')
-#
-#         if password != password2:
-#             return HttpResponseBadRequest('输入密码不一致')
-#
-#         redis_conn = get_redis_connection('default')
-#         redis_sms_code = redis_conn.get('sms:%s'%mobile)
-#         if redis_sms_code is None:
-#             return HttpResponseBadRequest('短信验证码已过期')
-#         if smscode != redis_sms_code.decode():
-#             return HttpResponseBadRequest('短信验证码不一致')
-#
-#         try:
-#             user=User.objects.create_user(username=mobile,mobile=mobile,password=password)
-#         except DatabaseError as e:
-#             return HttpResponseBadRequest('注册失败')
-#
-#         return HttpResponse('注册成功，重定向到首页')
+    def post(self,request):
+
+        mobile=request.POST.get('mobile')
+        password=request.POST.get('password')
+        password2=request.POST.get('password2')
+        smscode=request.POST.get('sms_code')
+
+        if not all([mobile,password,password2,smscode]):
+            return HttpResponseBadRequest('缺少必要的参数')
+
+        if not re.match(r'^1[3-9]\d{9}$',mobile):
+            return HttpResponseBadRequest('手机号不符合规则')
+
+        if not re.match(r'^[0-9A-Za-z]{8,20}$',password):
+            return HttpResponseBadRequest('请输入正确的8-20位密码，数字和字母')
+
+        if password != password2:
+            return HttpResponseBadRequest('输入密码不一致')
+
+        redis_conn = get_redis_connection('default')
+        redis_sms_code = redis_conn.get('sms:%s'%mobile)
+        if redis_sms_code is None:
+            return HttpResponseBadRequest('短信验证码已过期')
+        if smscode != redis_sms_code.decode():
+            return HttpResponseBadRequest('短信验证码不一致')
+
+        try:
+            user=User.objects.create_user(username=mobile,mobile=mobile,password=password)
+        except DatabaseError as e:
+            logger.error(e)
+            return HttpResponseBadRequest('注册失败')
+
+        #暂时返回成功消息，后期再跳转指定页面
+        return redirect(reverse('home:index'))
+        #return HttpResponse('注册成功，重定向到首页')
 
 
 from django.http.response import HttpResponseBadRequest
