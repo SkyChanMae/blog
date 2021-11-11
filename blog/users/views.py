@@ -49,10 +49,17 @@ class RegisterView(View):
             logger.error(e)
             return HttpResponseBadRequest('注册失败')
 
-        #暂时返回成功消息，后期再跳转指定页面
-        return redirect(reverse('home:index'))
-        #return HttpResponse('注册成功，重定向到首页')
 
+        from django.contrib.auth import login
+        login(request,user)
+
+        #暂时返回成功消息，后期再跳转指定页面
+        response = redirect(reverse('home:index'))
+        #return HttpResponse('注册成功，重定向到首页')
+        response.set_cookie('is_login',True)
+        response.set_cookie('username',user.username,max_age=7*24*3600)
+
+        return response
 
 from django.http.response import HttpResponseBadRequest
 from libs.captcha.captcha import captcha
@@ -113,3 +120,11 @@ class SmsCodeView(View):
         CCP().send_template_sms(mobile,[sms_code,5],1)
 
         return JsonResponse({'code':RETCODE.OK,'errmsg':'短信发送成功'})
+
+
+
+class LoginView(View):
+
+    def get(self,request):
+
+        return render(request,'login.html')
