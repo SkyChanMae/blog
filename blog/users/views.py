@@ -128,3 +128,40 @@ class LoginView(View):
     def get(self,request):
 
         return render(request,'login.html')
+
+    def post(self,request):
+
+        mobile = request.POST.get('mobile')
+        password = request.POST.get('password')
+        remember = request.POST.get('remember')
+
+        if not re.match(r'^1[3-9]\d{9}$',mobile):
+            return HttpResponseBadRequest('手机号不符合规则')
+
+        if not re.match(r'^[a-zA-Z0-9]{8,20}$',password):
+            return HttpResponseBadRequest('密码不符合规则')
+
+        from django.contrib.auth import authenticate
+
+        user = authenticate(mobile=mobile,password=password)
+
+        if user is None:
+            return HttpResponseBadRequest('用户名或密码错误')
+
+        from django.contrib.auth import login
+        login(request, user)
+
+
+        response = redirect(reverse('home:index'))
+
+        if remember != 'on':
+            request.session.set_expiry(0)
+            response.set_cookie('is_login',True)
+            response.set_cookie('username',user.username,max_age=14*24*3600)
+        else:
+            request.session.set_expiry(None)
+            response.set_cookie('is_login', True,max_age=14*24*3600)
+            response.set_cookie('username', user.username, max_age=14 * 24 * 3600)
+
+        return response
+
