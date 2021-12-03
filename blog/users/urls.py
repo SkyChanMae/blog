@@ -2,6 +2,7 @@ from django.urls import path
 from users.views import RegisterView,ImageCodeView
 from users.views import SmsCodeView,LoginView
 from users.views import LogoutView,ForgetPasswordView
+from users.views import UserCenterView
 urlpatterns = [
     path('register/',RegisterView.as_view(),name='register'),
 
@@ -24,6 +25,10 @@ urlpatterns = [
 
 
     path('forgetpassword/',ForgetPasswordView.as_view(),name='forgetpassword'),
+
+
+
+    path('center/',UserCenterView.as_view(),name='center'),
 ]
 
 
