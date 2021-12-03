@@ -154,7 +154,11 @@ class LoginView(View):
         from django.contrib.auth import login
         login(request, user)
 
-        response = redirect(reverse('home:index'))
+        next_page=request.GET.get('next')
+        if next_page:
+            response=redirect(next_page)
+        else:
+            response = redirect(reverse('home:index'))
 
         if remember != 'on':
             request.session.set_expiry(0)
@@ -231,11 +235,20 @@ class ForgetPasswordView(View):
         return response
 
 
-class UserCenterView(View):
+from django.contrib.auth.mixins import LoginRequiredMixin
+class UserCenterView(LoginRequiredMixin,View):
 
     def get(self,request):
 
-        return render(request,'center.html')
+        user=request.user
+
+        context = {
+            'username':user.username,
+            'mobile':user.mobile,
+            'avatar':user.avatar.url if user.avatar else None,
+            'user_desc':user.user_desc
+        }
+        return render(request,'center.html',context=context)
 
 
 
