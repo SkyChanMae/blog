@@ -92,6 +92,8 @@
             <br>
             <div>
                 <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ article.id }}">
                 <div class="form-group"><label for="body"><strong>我也要发言：</strong></label>
                     <div>
 
@@ -161,11 +163,9 @@
             <div class="sidebar__inner">
                     <h4><strong>推荐</strong></h4>
                     <hr>
-                    <a href="#" style="color: black">如何更好的学习Django呢？</a><br>
-                    <a href="#" style="color: black">如何更好的学习Django呢？</a><br>
-                    <a href="#" style="color: black">如何更好的学习Django呢？</a><br>
-                    <a href="#" style="color: black">如何更好的学习Django呢？</a><br>
-                    <a href="#" style="color: black">如何更好的学习Django呢？</a><br>
+                    {% for hot_article in hot_articles %}
+                        <a href="{% url 'home:detail' %}?id={{ hot_articles.id }}" style="color: black">{{ hot_articles.title}}</a><br>
+                    {% endfor %}
             </div>
         </div>
     </div>

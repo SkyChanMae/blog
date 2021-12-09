@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from home.models import ArticleCategory,Article
@@ -96,5 +96,34 @@ class DetailView(View):
             'page_num': page_num
         }
         return render(request,'detail.html',context=context)
+
+    def post(self, request):
+
+        user = request.user
+
+        if user and user.is_authenticated:
+
+            id = request.POST.get('id')
+            content = request.POST.get('content')
+
+            try:
+                article = Article.objects.get(id=id)
+            except Article.DoesNotExist:
+                return HttpResponseNotFound('没有此文章')
+
+            Comment.objects.create(
+                content=content,
+                article=article,
+                user=user
+            )
+
+            article.comments_count += 1
+            article.save()
+
+            path = reverse('home:detail') + '?id={}'.format(article.id)
+            return redirect(path)
+
+        else:
+            return redirect(reverse('users:login'))
 
 
