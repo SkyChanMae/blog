@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-from home.models import ArticleCategory,Article
+from home.models import ArticleCategory, Article
 from django.http.response import HttpResponseNotFound
+
+
 # Create your views here.
 class IndexView(View):
-    def get(self,request):
+    def get(self, request):
 
         categories = ArticleCategory.objects.all()
 
@@ -40,14 +42,15 @@ class IndexView(View):
             'page_num': page_num
         }
 
-        return render(request,'index.html',context=context)
-
+        return render(request, 'index.html', context=context)
 
 
 from home.models import Comment
+
+
 class DetailView(View):
 
-    def get(self,request):
+    def get(self, request):
 
         id = request.GET.get('id')
 
@@ -56,16 +59,12 @@ class DetailView(View):
         except Article.DoesNotExist:
             return render(request, '404.html')
         else:
-
             article.total_views += 1
             article.save()
 
-
         categories = ArticleCategory.objects.all()
 
-
         hot_articles = Article.objects.order_by('-total_views')[:9]
-
 
         page_size = request.GET.get('page_size', 10)
         page_num = request.GET.get('page_num', 1)
@@ -74,7 +73,7 @@ class DetailView(View):
 
         total_count = comments.count()
 
-        from django.core.paginator import Paginator,EmptyPage
+        from django.core.paginator import Paginator, EmptyPage
         paginator = Paginator(comments, page_size)
 
         try:
@@ -95,7 +94,7 @@ class DetailView(View):
             'total_page': total_page,
             'page_num': page_num
         }
-        return render(request,'detail.html',context=context)
+        return render(request, 'detail.html', context=context)
 
     def post(self, request):
 
@@ -125,5 +124,3 @@ class DetailView(View):
 
         else:
             return redirect(reverse('users:login'))
-
-
